@@ -21,6 +21,7 @@ class PokerState:
         self.players = list(players)
         self.pot = 0
         self.eval = Evaluator()
+        # self.state = state
 
     def Clone(self):
         st = PokerState(self.players,self.deck,self.board)
@@ -33,29 +34,38 @@ class PokerState:
         atual = self.players[self.playerJustMoved-1]
         assert atual.pocket > 0
 
-        if move[0] == 'fold':
-            self.players = self.players[3 - atual - 1]
-        if move[0] == 'raise ' and atual.pocket >= 10:
+        if move == 'fold':
+            atual.lastplay = 'fold'
+        elif move == 'raise' and atual.pocket >= 10:
             self.pot += 10.0
             atual.pocket -= 10.0
-        if self.players[3 - self.playerJustMoved - 1].lastplay == 'check':
+            atual.lastplay = 'raise'
+        elif atual.lastplay == 'check' or move == 'check':
+            atual.lastplay = 'check'
             pass
-        else:
+        elif move == 'bet':
             atual.pocket -= 5.0
             self.pot += 5.0
+            atual.lastplay = 'bet'
 
 
     def GetMoves(self):
         return ['fold', 'raise', 'bet', 'check']
 
     def GetResult(self, playerjm):
-        p1 = self.eval.evaluate(self.players[0].hand, self.board)
-        p2 = self.eval.evaluate(self.players[1].hand, self.board)
-        if p1 < p2:
+        if self.players[0].lastplay == 'fold':
             return 1.0
-        elif p1 == p2:
-            return 0.0
-        return -1
+        elif self.players[1].lastplay == 'fold':
+            return -1.0
+        else:
+            p1 = self.eval.evaluate(self.players[0].hand, self.board)
+            p2 = self.eval.evaluate(self.players[1].hand, self.board)
+            if p1 < p2:
+                return 1.0
+            elif p1 > p2:
+                return -1.0
+            else:
+                return 0.0
 
 
 class Node:
@@ -178,17 +188,17 @@ def UCTPlayGame():
     # while (p1.pocket > 0 and p2.pocket > 0):
     print str(state)
     if state.playerJustMoved == 1:
-        m = UCT(rootstate=state, itermax=50, verbose=False)  # play with values for itermax and verbose = True
+        m = UCT(rootstate=state, itermax=50, verbose=True)  # play with values for itermax and verbose = True
     else:
-        m = UCT(rootstate=state, itermax=20, verbose=False)
+        m = UCT(rootstate=state, itermax=20, verbose=True)
     print "Best Move: " + str(m) + "\n"
     state.DoMove(m)
     if state.GetResult(state.playerJustMoved) == 1.0:
         print "Player " + str(state.playerJustMoved) + " wins!"
     elif state.GetResult(state.playerJustMoved) == 0.0:
-        print "Player " + str(3 - state.playerJustMoved) + " wins!"
+        print "nobody"
     else:
-        print "Nobody wins!"
+        print "player 2 wins!"
 
 
 if __name__ == "__main__":
