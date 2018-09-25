@@ -14,24 +14,23 @@ class player:
 
 class PokerState:
     "A state in poker game"
-
-    def __init__(self, players):
+    def __init__(self, players,deck,board):
         self.playerJustMoved = 2
-        self.deck = Deck()
-        self.board = [0, 0, 0]
-        self.players = players
+        self.deck = deck
+        self.board = board
+        self.players = list(players)
         self.pot = 0
         self.eval = Evaluator()
 
     def Clone(self):
-        st = PokerState(self.players)
+        st = PokerState(self.players,self.deck,self.board)
         st.playerJustMoved = self.playerJustMoved
         st.board = self.board[:]
         return st
 
     def DoMove(self, move):
         self.playerJustMoved = 3 - self.playerJustMoved
-        atual = self.playerJustMoved
+        atual = self.players[self.playerJustMoved-1]
         assert atual.pocket > 0
 
         if move[0] == 'fold':
@@ -39,18 +38,19 @@ class PokerState:
         if move[0] == 'raise ' and atual.pocket >= 10:
             self.pot += 10.0
             atual.pocket -= 10.0
-        if self.players[3 - atual - 1].lastPlay == 'check':
+        if self.players[3 - self.playerJustMoved - 1].lastplay == 'check':
             pass
         else:
             atual.pocket -= 5.0
             self.pot += 5.0
 
+
     def GetMoves(self):
         return ['fold', 'raise', 'bet', 'check']
 
     def GetResult(self, playerjm):
-        p1 = self.eval.evaluate(self.players[0], self.board)
-        p2 = self.eval.evaluate(self.players[1], self.board)
+        p1 = self.eval.evaluate(self.players[0].hand, self.board)
+        p2 = self.eval.evaluate(self.players[1].hand, self.board)
         if p1 < p2:
             return 1.0
         elif p1 == p2:
@@ -140,9 +140,15 @@ def UCT(rootstate, itermax, verbose=False):
             state.DoMove(m)
             node = node.AddChild(m, state)  # add child and descend tree
 
+        # past = set()
         # Rollout - this can often be made orders of magnitude quicker using a state.GetRandomMove() function
-        while state.GetMoves() != []:  # while state is non-terminal
-            state.DoMove(random.choice(state.GetMoves()))
+
+        rolloutMoves = state.GetMoves()
+
+        while rolloutMoves != []:  # while state is non-terminal
+            move =random.choice(rolloutMoves)
+            rolloutMoves.remove(move)
+            state.DoMove(move)
 
         # Backpropagate
         while node != None:  # backpropagate from the expanded node and work back to the root node
@@ -165,15 +171,18 @@ def UCTPlayGame():
     """
     # state = OthelloState(4) # uncomment to play Othello on a square board of the given size
     # state = OXOState() # uncomment to play OXO
-    state = PokerState(15)  # uncomment to play Nim with the given number of starting chips
-    while (state.GetMoves() != []):
-        print str(state)
-        if state.playerJustMoved == 1:
-            m = UCT(rootstate=state, itermax=1000, verbose=False)  # play with values for itermax and verbose = True
-        else:
-            m = UCT(rootstate=state, itermax=100, verbose=False)
-        print "Best Move: " + str(m) + "\n"
-        state.DoMove(m)
+    deck = Deck()
+    p1 = player(deck.draw(2))
+    p2 = player(deck.draw(2))
+    state = PokerState([p1,p2],deck,deck.draw(3))  # uncomment to play Nim with the given number of starting chips
+    # while (p1.pocket > 0 and p2.pocket > 0):
+    print str(state)
+    if state.playerJustMoved == 1:
+        m = UCT(rootstate=state, itermax=50, verbose=False)  # play with values for itermax and verbose = True
+    else:
+        m = UCT(rootstate=state, itermax=20, verbose=False)
+    print "Best Move: " + str(m) + "\n"
+    state.DoMove(m)
     if state.GetResult(state.playerJustMoved) == 1.0:
         print "Player " + str(state.playerJustMoved) + " wins!"
     elif state.GetResult(state.playerJustMoved) == 0.0:
