@@ -4,56 +4,59 @@ import random
 from math import *
 from deuces.evaluator import *
 
+
 class player:
-    def __init__(self):
-        self.hand =
+    def __init__(self, hand):
+        self.hand = hand
         self.pocket = 5000.0
         self.lastplay = ''
+
+
 class PokerState:
     "A state in poker game"
 
-
-    def __init__(self,players):
+    def __init__(self, players):
         self.playerJustMoved = 2
-        self.board = [0,0,0,0,0]
-        self.playas = players
+        self.deck = Deck()
+        self.board = [0, 0, 0]
+        self.players = players
         self.pot = 0
         self.eval = Evaluator()
 
-
     def Clone(self):
-        st = PokerState(self.playas)
+        st = PokerState(self.players)
         st.playerJustMoved = self.playerJustMoved
         st.board = self.board[:]
         return st
 
-    def DoMove(self,move):
+    def DoMove(self, move):
         self.playerJustMoved = 3 - self.playerJustMoved
         atual = self.playerJustMoved
         assert atual.pocket > 0
 
         if move[0] == 'fold':
-             self.playas = self.playas[3- atual-1]
+            self.players = self.players[3 - atual - 1]
         if move[0] == 'raise ' and atual.pocket >= 10:
             self.pot += 10.0
             atual.pocket -= 10.0
-        if self.playas[3-atual-1].lastPlay == 'check':
+        if self.players[3 - atual - 1].lastPlay == 'check':
             pass
         else:
-            atual.pocket  -= 5.0
+            atual.pocket -= 5.0
             self.pot += 5.0
+
     def GetMoves(self):
-        return ['fold','raise','bet','check']
+        return ['fold', 'raise', 'bet', 'check']
 
-
-    def GetResult(self,playerjm):
-        p1 = self.eval.evaluate(self.playas[0], self.board)
-        p2 = self.eval.evaluate(self.playas[1], self.board)
+    def GetResult(self, playerjm):
+        p1 = self.eval.evaluate(self.players[0], self.board)
+        p2 = self.eval.evaluate(self.players[1], self.board)
         if p1 < p2:
             return 1.0
-        elif p1==p2:
+        elif p1 == p2:
             return 0.0
         return -1
+
 
 class Node:
     """ A node in the game tree. Note wins is always from the viewpoint of playerJustMoved.
@@ -114,6 +117,7 @@ class Node:
             s += str(c) + "\n"
         return s
 
+
 def UCT(rootstate, itermax, verbose=False):
     """ Conduct a UCT search for itermax iterations starting from rootstate.
         Return the best move from the rootstate.
@@ -154,6 +158,7 @@ def UCT(rootstate, itermax, verbose=False):
 
     return sorted(rootnode.childNodes, key=lambda c: c.visits)[-1].move  # return the move that was most visited
 
+
 def UCTPlayGame():
     """ Play a sample game between two UCT players where each player gets a different number
         of UCT iterations (= simulations = tree nodes).
@@ -175,6 +180,7 @@ def UCTPlayGame():
         print "Player " + str(3 - state.playerJustMoved) + " wins!"
     else:
         print "Nobody wins!"
+
 
 if __name__ == "__main__":
     """ Play a single game to the end using UCT for both players. 
