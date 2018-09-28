@@ -5,67 +5,87 @@ from math import *
 from deuces.evaluator import *
 
 
-class player:
-    def __init__(self, hand):
-        self.hand = hand
-        self.pocket = 5000.0
-        self.lastplay = ''
-
-
 class PokerState:
     "A state in poker game"
-    def __init__(self, players,deck,board):
-        self.playerJustMoved = 2
-        self.deck = deck
-        self.board = board
-        self.players = list(players)
-        self.pot = 0
-        self.eval = Evaluator()
-        # self.state = state
+    def __init__(self,qntd_players):
+        # self.game_deck = deuces.deck
+        # self.player_turn = 0
+        # self.state = 0
+        # self.game = game(qntd_players)
+        # self.game.board = self.game.game_deck.draw(5)
+        # self.game.players = [self.game.game_deck.draw(2),self.game.game_deck.draw(2)]
+        # self.players_list = self.game.player_on
+
+        self.game_deck = deuces.Deck()
+        self.game_players = [self.game_deck.draw(2), self.game_deck.draw(2)]
+        self.last_act = [1,1]
+        self.board = self.game_deck.draw(5)
+        self.player_turn = 0
+        self.state = 1
+        self.eval = deuces.Evaluator()
 
     def Clone(self):
-        st = PokerState(self.players,self.deck,self.board)
-        st.playerJustMoved = self.playerJustMoved
+        st = PokerState(self)
+        st.player_turn = int(self.player_turn)
+        st.state= self.state
+        st.eval = self.eval
+        st.last_act = self.last_act[:]
+        st.game_players= self.game_players[:]
         st.board = self.board[:]
+
         return st
 
-    def DoMove(self, move):
-        self.playerJustMoved = 3 - self.playerJustMoved
-        atual = self.players[self.playerJustMoved-1]
-        assert atual.pocket > 0
-
-        if move == 'fold':
-            atual.lastplay = 'fold'
-        elif move == 'raise' and atual.pocket >= 10:
-            self.pot += 10.0
-            atual.pocket -= 10.0
-            atual.lastplay = 'raise'
-        elif atual.lastplay == 'check' or move == 'check':
-            atual.lastplay = 'check'
-            pass
-        elif move == 'bet':
-            atual.pocket -= 5.0
-            self.pot += 5.0
-            atual.lastplay = 'bet'
 
 
     def GetMoves(self):
-        return ['fold', 'raise', 'bet', 'check']
 
-    def GetResult(self, playerjm):
-        if self.players[0].lastplay == 'fold':
+        if(self.state >= 3) : return []
+
+        if self.last_act[abs(self.player_turn-1)] == 'fold':return []
+
+        return ['call', 'fold','bet','raise']
+
+
+    def GetResult(self,pt):
+        if self.last_act[pt] == 'fold':
             return 1.0
-        elif self.players[1].lastplay == 'fold':
-            return -1.0
+        elif self.last_act[(pt+1)%2] == 'fold':
+            return 0.0
         else:
-            p1 = self.eval.evaluate(self.players[0].hand, self.board)
-            p2 = self.eval.evaluate(self.players[1].hand, self.board)
+            p1 = self.eval.evaluate(self.game_players[abs(pt-1)], self.board[:(2+self.state)])
+            p2 = self.eval.evaluate(self.game_players[pt], self.board[:(2 + self.state)])
             if p1 < p2:
                 return 1.0
-            elif p1 > p2:
-                return -1.0
             else:
                 return 0.0
+
+
+
+    def prox_valido(self,indice):
+        return (indice+1)%2
+
+
+
+
+    def DoMove(self, move):
+
+        if move == 'fold':
+
+            self.last_act[self.player_turn] = 'fold'
+
+        if (move == 'bet'):
+
+            self.last_act[self.player_turn] = 'bet'
+
+
+
+        if (move == 'check'):
+            self.last_act[self.player_turn] = 'check'
+        self.player_turn = abs(self.player_turn - 1)
+
+        if self.player_turn - 1 == 0 :
+            self.state += 1
+
 
 
 class Node:
@@ -74,34 +94,28 @@ class Node:
     """
 
     def __init__(self, move=None, parent=None, state=None):
-        self.move = move  # the move that got us to this node - "None" for the root node
-        self.parentNode = parent  # "None" for the root node
+        self.move = move
+        self.parentNode = parent
         self.childNodes = []
         self.wins = 0
         self.visits = 0
-        self.untriedMoves = state.GetMoves()  # future child nodes
-        self.playerJustMoved = state.playerJustMoved  # the only part of the state that the Node needs later
+        self.untriedMoves = state.GetMoves()
+        self.playerJustMoved = state.player_turn
 
     def UCTSelectChild(self):
-        """ Use the UCB1 formula to select a child node. Often a constant UCTK is applied so we have
-            lambda c: c.wins/c.visits + UCTK * sqrt(2*log(self.visits)/c.visits to vary the amount of
-            exploration versus exploitation.
-        """
+
         s = sorted(self.childNodes, key=lambda c: c.wins / c.visits + sqrt(2 * log(self.visits) / c.visits))[-1]
         return s
 
     def AddChild(self, m, s):
-        """ Remove m from untriedMoves and add a new child node for this move.
-            Return the added child node
-        """
+
         n = Node(move=m, parent=self, state=s)
         self.untriedMoves.remove(m)
         self.childNodes.append(n)
         return n
 
     def Update(self, result):
-        """ Update this node - one additional visit and result additional wins. result must be from the viewpoint of playerJustmoved.
-        """
+
         self.visits += 1
         self.wins += result
 
@@ -129,9 +143,7 @@ class Node:
 
 
 def UCT(rootstate, itermax, verbose=False):
-    """ Conduct a UCT search for itermax iterations starting from rootstate.
-        Return the best move from the rootstate.
-        Assumes 2 alternating players (player 1 starts), with game results in the range [0.0, 1.0]."""
+
 
     rootnode = Node(state=rootstate)
 
@@ -140,33 +152,30 @@ def UCT(rootstate, itermax, verbose=False):
         state = rootstate.Clone()
 
         # Select
-        while node.untriedMoves == [] and node.childNodes != []:  # node is fully expanded and non-terminal
+        while node.untriedMoves == [] and node.childNodes != []:
             node = node.UCTSelectChild()
             state.DoMove(node.move)
 
         # Expand
-        if node.untriedMoves != []:  # if we can expand (i.e. state/node is non-terminal)
+        if node.untriedMoves != []:
             m = random.choice(node.untriedMoves)
             state.DoMove(m)
-            node = node.AddChild(m, state)  # add child and descend tree
+            node = node.AddChild(m, state)
 
-        # past = set()
-        # Rollout - this can often be made orders of magnitude quicker using a state.GetRandomMove() function
 
         rolloutMoves = state.GetMoves()
 
-        while rolloutMoves != []:  # while state is non-terminal
+        while rolloutMoves != []:
             move =random.choice(rolloutMoves)
             rolloutMoves.remove(move)
             state.DoMove(move)
 
         # Backpropagate
-        while node != None:  # backpropagate from the expanded node and work back to the root node
+        while node != None:
             node.Update(state.GetResult(
-                node.playerJustMoved))  # state is terminal. Update node with result from POV of node.playerJustMoved
+                node.playerJustMoved))
             node = node.parentNode
 
-    # Output some information about the tree - can be omitted
     if (verbose):
         print rootnode.TreeToString(0)
     else:
@@ -176,27 +185,17 @@ def UCT(rootstate, itermax, verbose=False):
 
 
 def UCTPlayGame():
-    """ Play a sample game between two UCT players where each player gets a different number
-        of UCT iterations (= simulations = tree nodes).
-    """
-    # state = OthelloState(4) # uncomment to play Othello on a square board of the given size
-    # state = OXOState() # uncomment to play OXO
-    deck = Deck()
-    p1 = player(deck.draw(2))
-    p2 = player(deck.draw(2))
-    state = PokerState([p1,p2],deck,deck.draw(3))  # uncomment to play Nim with the given number of starting chips
-    # while (p1.pocket > 0 and p2.pocket > 0):
+    state = PokerState(2)  # uncomment to play Nim with the given number of starting chips
     print str(state)
-    if state.playerJustMoved == 1:
-        m = UCT(rootstate=state, itermax=50, verbose=True)  # play with values for itermax and verbose = True
-    else:
-        m = UCT(rootstate=state, itermax=20, verbose=True)
-    print "Best Move: " + str(m) + "\n"
-    state.DoMove(m)
-    if state.GetResult(state.playerJustMoved) == 1.0:
-        print "Player " + str(state.playerJustMoved) + " wins!"
-    elif state.GetResult(state.playerJustMoved) == 0.0:
-        print "nobody"
+    while (state.GetMoves() != []):
+        if state.player_turn == 0:
+            m = UCT(rootstate=state, itermax=1000, verbose=True)  # play with values for itermax and verbose = True
+        else:
+            m = UCT(rootstate=state, itermax= 1000, verbose=True)
+        print "Best Move: " + str(m) + "\n"
+        state.DoMove(m)
+    if state.GetResult(state.player_turn) == 1.0:
+        print "Player " + str(state.player_turn) + " wins!"
     else:
         print "player 2 wins!"
 
