@@ -124,12 +124,13 @@ class Node:
 
 
 def min_max(rootstate, tree_depth, actual_depth, max_or_min, move, verbose=False):
-    if actual_depth == tree_depth:
-        return max_or_min
-
     rootnode = Node(state=rootstate)
     node = rootnode
     state = rootstate.Clone()
+
+    if actual_depth == tree_depth:
+        return state.GetResult
+
     all_values = []
 
     for node_move in state.GetMoves():
@@ -154,11 +155,11 @@ def UCTPlayGame():
     Card.print_pretty_cards(state.game_players[0])
     while (state.GetMoves() != []):
         if state.player_turn == 0:
-            m = "call"  # play with values for itermax and verbose = True
+            m = raw_input("digite jogada: call, raise, fold, bet")  # play with values for itermax and verbose = True
             x += 1
             Card.print_pretty_cards(state.board[:x])
         else:
-            m = min_max(rootstate=state, tree_depth=5, actual_depth=0, max_or_min=1, move="call", verbose=False)
+            m = min_max(rootstate=state, tree_depth=3, actual_depth=0, max_or_min=1, move="call", verbose=False)
         print "Best Move: " + str(m) + "\n"
         state.DoMove(m)
     Card.print_pretty_cards(state.game_players[1])
