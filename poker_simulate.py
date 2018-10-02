@@ -187,13 +187,19 @@ def UCT(rootstate, itermax, verbose=False):
 def UCTPlayGame():
     state = PokerState(2)  # uncomment to play Nim with the given number of starting chips
     print str(state)
+    x = 3
+    Card.print_pretty_cards(state.board[:x])
+    Card.print_pretty_cards(state.game_players[0])
     while (state.GetMoves() != []):
         if state.player_turn == 0:
-            m = UCT(rootstate=state, itermax=1000, verbose=True)  # play with values for itermax and verbose = True
+            m = raw_input("digite jogada: call, raise, fold, bet")  # play with values for itermax and verbose = True
+            x += 1
+            Card.print_pretty_cards(state.board[:x])
         else:
-            m = UCT(rootstate=state, itermax= 1000, verbose=True)
+            m = UCT(rootstate=state, itermax= 10, verbose=False)
         print "Best Move: " + str(m) + "\n"
         state.DoMove(m)
+    Card.print_pretty_cards(state.game_players[1])
     if state.GetResult(state.player_turn) == 1.0:
         print "Player " + str(state.player_turn) + " wins!"
     else:
