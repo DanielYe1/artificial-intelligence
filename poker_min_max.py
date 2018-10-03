@@ -3,7 +3,7 @@ import deuces
 import random
 from math import *
 from deuces.evaluator import *
-
+import numpy as np
 
 class PokerState:
     "A state in poker game"
@@ -129,7 +129,7 @@ def min_max(rootstate, tree_depth, actual_depth, max_or_min, move, verbose=False
     state = rootstate.Clone()
 
     if actual_depth == tree_depth:
-        return state.GetResult
+        return max_or_min
 
     all_values = []
 
@@ -139,13 +139,8 @@ def min_max(rootstate, tree_depth, actual_depth, max_or_min, move, verbose=False
         elif max_or_min == 0:
             all_values.insert(0, min_max(rootstate, tree_depth, actual_depth+1, 1, node_move))
 
-    if max_or_min == 1:
-        return sorted(all_values)[0]
-    elif max_or_min == 0:
-        return sorted(all_values)[:]
-
-    return all_values
-
+    avg = np.average(all_values)
+    return avg
 
 def UCTPlayGame():
     state = PokerState(2)  # uncomment to play Nim with the given number of starting chips
@@ -159,7 +154,8 @@ def UCTPlayGame():
             x += 1
             Card.print_pretty_cards(state.board[:x])
         else:
-            m = min_max(rootstate=state, tree_depth=3, actual_depth=0, max_or_min=1, move="call", verbose=False)
+            m = min_max(rootstate=state, tree_depth=2, actual_depth=0, max_or_min=1, move="call", verbose=False)
+            print(m )
         print "Best Move: " + str(m) + "\n"
         state.DoMove(m)
     Card.print_pretty_cards(state.game_players[1])
