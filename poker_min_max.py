@@ -15,6 +15,7 @@ class PokerState:
         self.last_act = [1, 1]
         self.board = self.game_deck.draw(5)
         self.player_turn = 0
+        self.now = 'bet'
         self.state = 1
         self.eval = deuces.Evaluator()
 
@@ -123,24 +124,61 @@ class Node:
         return s
 
 
-def min_max(rootstate, tree_depth, actual_depth, max_or_min, move, verbose=False):
-    rootnode = Node(state=rootstate)
-    node = rootnode
-    state = rootstate.Clone()
+# def min_max(rootstate, tree_depth, actual_depth, max_or_min, move, verbose=False):
+#     rootnode = Node(state=rootstate)
+#     node = rootnode
+#     state = rootstate.Clone()
+#
+#     if actual_depth == tree_depth:
+#         return random.randrange(1,7)/10
+#
+#     all_values = []
+#
+#     for node_move in state.GetMoves():
+#         if max_or_min == 1:
+#             all_values.insert(0, min_max(rootstate, tree_depth, actual_depth+1, 0, node_move))
+#         elif max_or_min == 0:
+#             all_values.insert(0, min_max(rootstate, tree_depth, actual_depth+1, 1, node_move))
+#
+#     avg = np.average(all_values)
+#     return avg
 
-    if actual_depth == tree_depth:
-        return max_or_min
 
-    all_values = []
+def expectminimax(state,depth):
+    if(depth == 5 ):# max_depth retorna a funcao de utilidade
+        return 25 #retorna o valor de utilidade de v
+    elif(state.now == 'chance'): # o estado atual eh um calculo de chance
+        d = 1
+        s = 0
+        #todo  filho de state do
+        for i in state.getMoves():
+            n = state.clone()
+            n.state.now = i
+            d = d - 0.25
+            e = expectminimax(n,depth+1)
+            s = s + 0.25*e
 
-    for node_move in state.GetMoves():
-        if max_or_min == 1:
-            all_values.insert(0, min_max(rootstate, tree_depth, actual_depth+1, 0, node_move))
-        elif max_or_min == 0:
-            all_values.insert(0, min_max(rootstate, tree_depth, actual_depth+1, 1, node_move))
+        return s
+    elif(state.now == 'min'):
+        e = 99999999
 
-    avg = np.average(all_values)
-    return avg
+        for i in state.getMoves():
+            clone = state.clone()
+            clone.now = i
+            t = expectminimax(clone,depth+1)
+            if(t < e) : e = t
+        return e
+    elif(state.now == 'max'):
+
+        e = -99999999
+
+        for i in state.getMoves():
+            clone = state.clone()
+            clone.now = i
+            t = expectminimax(clone(i),depth+1)
+            if(t > e) : e = t
+        return e
+
 
 def UCTPlayGame():
     state = PokerState(2)  # uncomment to play Nim with the given number of starting chips
@@ -154,15 +192,15 @@ def UCTPlayGame():
             x += 1
             Card.print_pretty_cards(state.board[:x])
         else:
-            m = min_max(rootstate=state, tree_depth=2, actual_depth=0, max_or_min=1, move="call", verbose=False)
-            print(m )
+            m = expectminimax(state,0)#rootstate=state, tree_depth=5, actual_depth=0, max_or_min=1, move="call", verbose=False)
+            print(m)
         print "Best Move: " + str(m) + "\n"
         state.DoMove(m)
     Card.print_pretty_cards(state.game_players[1])
     if state.GetResult(state.player_turn) == 1.0:
         print "Player " + str(state.player_turn) + " wins!"
     else:
-        print "player 2 wins!"
+        print "Player " + str(state.player_turn-1) + " wins!"
 
 
 if __name__ == "__main__":
