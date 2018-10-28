@@ -49,9 +49,9 @@ abandonada(saudePublica).
 deveSer(municipio, responsavel, assistenciaBasicaSaude).
 deveSer(municipio, responsavel, prevencaoDoencas).
 
-temSido(municipio, responsavel, assistenciaBasicaSaude)
-temSido(municipio, responsavel, cirurgiaComplexa)
+temSido(municipio, responsavel, assistenciaBasicaSaude).
+temSido(municipio, responsavel, cirurgiaComplexa).
 
-devePararDeSer(X,Y,Z) :- temSido(X,Y,Z), not(deveSer(X,Y,Z))
-deveComecarASer(X,Y,Z) :- deveSer(X,Y,Z), not(temSido(X,Y,Z))
+devePararDeSer(X,Y,Z) :- temSido(X,Y,Z), not(deveSer(X,Y,Z)).
+deveComecarASer(X,Y,Z) :- deveSer(X,Y,Z), not(temSido(X,Y,Z)).
 
