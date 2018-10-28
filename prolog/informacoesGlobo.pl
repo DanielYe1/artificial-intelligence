@@ -1,13 +1,13 @@
 /* debate globo */
-investe(iniciativaPrivada,presal).
+investir(iniciativaPrivada,presal).
 
 deveSer(municipio,responsavel,educacaoInfantil).
 
 deveReceber(auxilio,iniciativaPrivada,saudePublica).
 
-combate(trafico,auxilia,seguranca).
+combater(trafico,auxilia,seguranca).
 
-investe(governo,ensinoTecnico).
+investir(governo,ensinoTecnico).
 
 
 /* entrevista globo */
@@ -15,12 +15,12 @@ investe(governo,ensinoTecnico).
 solucao(dividas,atrasoPagamento).
 solucao(dividas,renegociacao).
 solucao(dividas,recuperacaoFiscal).
-solucao(dividas,capitalEstrangeiro)
+solucao(dividas,capitalEstrangeiro).
 
 solucionaria(dividas,aberturaDeCapital).
 solucionaria(dividas,capitalEstrangeiro).
 
-atrai(capitalEstrangeiro,contratosDeLongoPrazo).
+atrair(capitalEstrangeiro,contratosDeLongoPrazo).
 
 rever(congresso,recuperacaoFiscal).
 
@@ -35,12 +35,8 @@ iraConduzir(gabineteDeSeguranca,secretarioPoliciaCivil).
 
 assistencia(qualquerPolicial,autoDeResistencia).
 
-
-investe(governo,escolasMilitares)
-
-transforma(escolasPublicas,escolasMilitares)
+investir(governo,escolasMilitares).
+transforma(escolasPublicas,escolasMilitares).
 
 cobrar(universidadesPublicas).
-manter(cotas)
-
-
+manter(cotas).
