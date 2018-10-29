@@ -17,15 +17,16 @@ solucao(dividas,atrasoPagamento).
 solucao(dividas,renegociacao).
 solucao(dividas,recuperacaoFiscal).
 solucao(dividas,capitalEstrangeiro).
+solucao(dividas,aberturaDeCapital).
 
-solucionaria(dividas,aberturaDeCapital).
-solucionaria(dividas,capitalEstrangeiro).
+permitidaPor(capitalEstrangeiro,contratosDeLongoPrazo).
+% bom senso
+permitidaPor(renegociacao,pagamentoDeDebitos).
+permitidaPor(renegociacao,corteDeCustos).
+bloqueia(atrasoPagamento,pagamentoDeDebitos).
 
-atrair(capitalEstrangeiro,contratosDeLongoPrazo).
 
 rever(congresso,recuperacaoFiscal).
-
-
 
 extinguir(secretariaSegurancaPublica).
 seraConduzida(seguranca,gabineteDeSeguranca).
