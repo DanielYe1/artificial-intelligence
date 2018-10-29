@@ -15,3 +15,6 @@ intervencao(X,Y) ; positivo(X,Y)
 
 %p6 o discurso de política de confrontos é eleitoreiro, ou seja, ele propunha algo antes e mudou o discurso em poucos meses?
 discursoEleitoreiro(politicaDeConfrontos, politicaDeAbates)
+
+%p7 o candidato quer de fato combater a corrupção?
+querCombater(corrupcao, aryFerreira)
