@@ -1,0 +1,32 @@
+
+intervencao(aumentou,rouboDeCarga).
+intervencao(aumentou,homicidios).
+intervencao(diminuiu,rouboDeCarros).
+intervencao(aumentou,rouboAEstabelecimentos).
+intervencao(aumentou,assaltoAPedestres).
+
+assassinato(marielle).
+assassinato(marcosVinicius).
+
+positivo(X,Y) :- (intervencao(X,Y), Y=diminuiu).
+negativo(X,Y) :- (intervencao(X,Y), Y=aumentou).
+
+etica(forçasArmadas).
+moral(forçasArmadas).
+
+etica(marinha).
+moral(marinha).
+
+etica(aeronautica).
+moral(aeronautica).
+
+etica(civil).
+moral(civil).
+
+corrupto(X) :- not(moral(X),etica(X)).
+
+seguranca(forçasArmadas).
+seguranca(civil).
+
+
+/* senso comum */
