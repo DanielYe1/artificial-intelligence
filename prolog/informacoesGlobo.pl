@@ -39,6 +39,16 @@ assistencia(qualquerPolicial,autoDeResistencia).
 cobrar(universidadesPublicas).
 manter(cotas).
 
+/* polemicas sobre auxilioMoradia */
+/*https://g1.globo.com/rj/rio-de-janeiro/eleicoes/2018/noticia/2018/10/28/wilson-witzel-do-psc-e-eleito-governador-do-rj.ghtml */
+/* https://congressoemfoco.uol.com.br/especial/noticias/apenas-15-dos-juizes-federais-abrem-mao-de-auxilio-moradia-mostra-levantamento/ */
+ehContra(auxilioMoradia,witzel).
+ehContra(auxilioMoradia,carlosRoberto).
+ehFavoravel(auxilioMoradia,luizFux).
+recebe(auxilioMoradia,witzel).
+recebe(auxilioMoradia,luizFux).
+
+
 /* Prestar atenção a partir daqui, que foi onde realizei a primeira pergunta: ehSolucao(transformar(escolasPublicas, escolasMilitares))*/
 proposta(transformar(escolasPublicas,escolasMilitares)).
 
