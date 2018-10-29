@@ -9,3 +9,6 @@ solucao(A,B),solucao(X,Y),permitidaPor(Y,Z),bloqueia(B,Z).
 
 %p4 existe alguma instituicao de ensino que o governo investe que produz coisas pra iniciativaPrivada e vice versa?
 investir(governo,X),investir(iniciativaPrivada,Y),((ehEnsino(X),produz(Y,X));(ehEnsino(Y),(produz(X,Y)))).
+
+%p5 intervenção militar foi positiva no rio e deixa um legado para a segurança pública
+intervencao(X,Y) ; positivo(X,Y)
