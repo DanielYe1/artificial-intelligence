@@ -1,4 +1,4 @@
-% p1
+%p1 transformar escolas públicas em militares é uma solução viável?
 ehSolucao(transformar(escolasPublicas, escolasMilitares)).
 
 %p2 
@@ -12,3 +12,6 @@ investir(governo,X),investir(iniciativaPrivada,Y),((ehEnsino(X),produz(Y,X));(eh
 
 %p5 intervenção militar foi positiva no rio e deixa um legado para a segurança pública
 intervencao(X,Y) ; positivo(X,Y)
+
+%p6 o discurso de política de confrontos é eleitoreiro, ou seja, ele propunha algo antes e mudou o discurso em poucos meses?
+discursoEleitoreiro(politicaDeConfrontos, politicaDeAbates)
