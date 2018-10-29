@@ -8,7 +8,13 @@ deveSer(municipio,responsavel,educacaoInfantil).
 deveReceber(auxilio,iniciativaPrivada,saudePublica).
 
 combater(trafico,auxilia,seguranca).
-
+% bom senso
+produz(pesquisa,ensinoTecnico).
+produz(pesquisa,ensinoSuperior).
+ehEnsino(ensinoTecnico).
+ehEnsino(ensinoSuperior).
+ehEnsino(escolasMilitares).
+ehEnsino(escolasPublicas).
 
 
 /* entrevista globo */
