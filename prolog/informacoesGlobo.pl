@@ -51,6 +51,10 @@ manter(cotas).
 /* https://congressoemfoco.uol.com.br/especial/noticias/apenas-15-dos-juizes-federais-abrem-mao-de-auxilio-moradia-mostra-levantamento/ */
 ehContra(auxilioMoradia,witzel).
 ehContra(auxilioMoradia,carlosRoberto).
+/* Fonte que era contra em junho: https://www1.folha.uol.com.br/poder/2018/06/pre-candidato-pelo-psc-ex-juiz-quer-extinguir-secretaria-de-seguranca-no-rj.shtml
+ * Fonte que é a favor em outubro: https://www.bbc.com/portuguese/brasil-46013245 */
+ehContra(politicaDeConfrontos, junho).
+ehFavoravel(politicaDeAbates, outubro).
 ehFavoravel(auxilioMoradia,luizFux).
 recebe(auxilioMoradia,witzel).
 recebe(auxilioMoradia,luizFux).
@@ -74,10 +78,7 @@ melhora(vida, pessoas) :- not(cortaInvestimentos(areasBasicas)).
 multiplicaCusto(estudantes, 3) :- not(falta(dinheiro, estado)) ; cortaInvestimentos(areasBasicas).
 cortaInvestimentos(areasBasicas) :- not(necessario(investimentos, areasBasicas)).
 
-/* Fonte que era contra em junho: https://www1.folha.uol.com.br/poder/2018/06/pre-candidato-pelo-psc-ex-juiz-quer-extinguir-secretaria-de-seguranca-no-rj.shtml
- * Fonte que é a favor em outubro: https://www.bbc.com/portuguese/brasil-46013245 */
-ehContra(politicaDeConfrontos, junho).
-ehFavoravel(politicaDeAbates, outubro).
+/* fatos e regras para pergunta de discurso eleitoreiro */
 equivalentes(politicaDeConfrontos,politicaDeAbates).
 discursoEleitoreiro(X,Y) :- equivalentes(X, Y), ehContra(X, junho), ehFavoravel(Y, outubro).
 
