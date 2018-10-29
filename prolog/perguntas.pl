@@ -18,3 +18,6 @@ discursoEleitoreiro(politicaDeConfrontos, politicaDeAbates)
 
 %p7 o candidato quer de fato combater a corrupção?
 querCombater(corrupcao, aryFerreira)
+
+%p8 Witzel pode ser considerado um corruptor?
+corruptor(witzel)
