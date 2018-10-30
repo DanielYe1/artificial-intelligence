@@ -55,3 +55,14 @@ temSido(municipio, responsavel, cirurgiaComplexa).
 devePararDeSer(X,Y,Z) :- temSido(X,Y,Z), not(deveSer(X,Y,Z)).
 deveComecarASer(X,Y,Z) :- deveSer(X,Y,Z), not(temSido(X,Y,Z)).
 
+
+intervencao(aumentou,rouboDeCarga).
+intervencao(aumentou,homicidios).
+intervencao(diminuiu,rouboDeCarros).
+intervencao(aumentou,rouboAEstabelecimentos).
+intervencao(aumentou,assaltoAPedestres).
+
+positivo(X,Y) :- (intervencao(X,Y), Y=diminuiu).
+negativo(X,Y) :- (intervencao(X,Y), Y=aumentou).
+
+
